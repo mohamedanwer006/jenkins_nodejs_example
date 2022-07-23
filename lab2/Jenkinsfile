@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/mohamedanwer006/jenkins_nodejs_example.git'
+            }
+        }
+        
+        stage('build') {
+            
+            steps {
+                
+                sh 'docker build -t mohameddev006/iti-node-app:latest .'
+                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                     sh "docker login -u ${USERNAME} -p ${PASSWORD}"
+                     sh "docker push mohameddev006/iti-node-app:latest"
+                     sh "docker run -p -d 3000:3000 mohameddev006/iti-node-app:latest"
+                    }
+            }
+            
+        }
+    }
+}
